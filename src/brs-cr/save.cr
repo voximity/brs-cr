@@ -14,8 +14,8 @@ module BRS
 
     property mods : Array(String) = [] of String
     property brick_assets : Array(String) = ["PB_DefaultBrick"] of String
-    property colors : Array(Color) = [] of Color
-    property materials : Array(String) = ["BMC_Ghost", "BMC_Ghost_Fail", "BMC_Plastic", "BMC_Glow", "BMC_Metallic", "BMC_Hologram"] of String
+    property colors : Array(Color) = BRS::DEFAULT_PALETTE
+    property materials : Array(String) = BRS::DEFAULT_MATERIALS
     property brick_owners : Array(User) = [] of User
 
     property bricks : Array(Brick) = [] of Brick
@@ -104,7 +104,7 @@ module BRS
       io.write(Bytes.new(3) { |i| BRS::MAGIC[i].to_u8 })
 
       # Write the version
-      io.write_bytes(4_u16, IO::ByteFormat::LittleEndian)
+      io.write_bytes(@version, IO::ByteFormat::LittleEndian)
 
       # Header 1
       Write.write_compressed(io) do |io|
@@ -127,7 +127,7 @@ module BRS
 
       # Bricks
       Write.write_compressed(io) do |io|
-        bit_writer = Write::BitWriter.new
+        bit_writer = Write::BitWriter.new(io)
         @bricks.each do |brick|
           bit_writer.align
           bit_writer.write_int(brick.asset_name_index, [@brick_assets.size, 2].max)
@@ -152,9 +152,10 @@ module BRS
             bit_writer.write_bit(true)
             brick.color.not_nil!.write(bit_writer)
           end
+          #puts bit_writer.bit_num
           bit_writer.write_packed_uint(brick.owner_index.nil? ? 0_u32 : brick.owner_index.not_nil! + 1)
         end
-        bit_writer.write_to(io)
+        bit_writer.finish
       end
 
       io.close # closes whether or not you like it

@@ -1,4 +1,10 @@
 module BRS
+  DEFAULT_PALETTE = [
+    0xffffffff, 0x888888ff, 0x595959ff, 0x393939ff, 0x232323ff, 0x111111ff, 0x060606ff, 0x000000ff, 0x570509ff, 0xea0606ff, 0xf64906ff, 0xea9d06ff, 0x088a05ff, 0x0498aaff, 0xa32355ff, 0x5a1237ff, 0x160401ff, 0x31140dff, 0x591004ff, 0x903c12ff, 0xa6683eff, 0xff9f4eff, 0xc2a33aff, 0xffaf2fff, 0x051205ff, 0x051e02ff, 0x152400ff, 0x004c00ff, 0x0b360aff, 0x434f0cff, 0xff920aff, 0x6d4005ff, 0x0a1e2bff, 0x1e2729ff, 0x475c60ff, 0x83acb5ff, 0x5093a2ff, 0x0876c8ff, 0x00407aff, 0x012240ff, 0xff0e0e99, 0xffcc0599, 0x1f901299, 0x2b85bd99, 0x57050999, 0xf6490699, 0x082b0f99, 0xffffff99, 0xffffff99, 0x88888899, 0x59595999, 0x39393999, 0x23232399, 0x11111199, 0x06060699, 0x00000099
+  ].map { |n| Color.new(n.to_u32) }
+
+  DEFAULT_MATERIALS = ["BMC_Ghost", "BMC_Ghost_Fail", "BMC_Plastic", "BMC_Glow", "BMC_Metallic", "BMC_Hologram"]
+
   enum Direction : UInt8
     XPositive
     XNegative
@@ -79,6 +85,15 @@ module BRS
       self.new(r: r.to_u8, g: g.to_u8, b: b.to_u8, a: a.to_u8)
     end
 
+    def self.new(n : UInt32)
+      self.new(
+        r: ((n >> 24) & 0xFF).to_u8,
+        g: ((n >> 16) & 0xFF).to_u8,
+        b: ((n >> 8) & 0xFF).to_u8,
+        a: (n & 0xFF).to_u8
+      )
+    end
+
     def initialize(*, @r, @g, @b, @a)
     end
 
@@ -115,8 +130,8 @@ module BRS
 
   struct Brick
     getter asset_name_index : Int32
-    getter size : UVector3
-    getter position : Vector3
+    getter size : UVector3 = UVector3::ZERO
+    getter position : Vector3 = Vector3::ZERO
     getter direction : Direction = Direction::ZPositive
     getter rotation : Rotation = Rotation::Deg0
     getter collision : Bool = true
@@ -128,8 +143,8 @@ module BRS
 
     def initialize(*,
                    @asset_name_index = 0,
-                   @size,
-                   @position,
+                   @size = UVector3::ZERO,
+                   @position = Vector3::ZERO,
                    @direction = Direction::ZPositive,
                    @rotation = Rotation::Deg0,
                    @collision = true,

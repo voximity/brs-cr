@@ -55,11 +55,11 @@ module BRS::Write
   end
 
   class BitWriter
-    getter buffer = [] of UInt8
+    getter io : IO
     getter cur : UInt8 = 0_u8
     getter bit_num = 0
 
-    def initialize
+    def initialize(@io)
     end
 
     def write_bit(state)
@@ -70,18 +70,18 @@ module BRS::Write
 
     def write_bits(source, length)
       length.times do |bit|
-        write_bit((source[bit >> 3] & (1 << (bit & 7))) != 0)
+        write_bit((source[bit >> 3].to_i32 & (1 << (bit & 7))) != 0_i32)
       end
     end
 
-    def write_bytes(source)
+    def write_bytes(source : Array(UInt8))
       write_bits(source, 8 * source.size)
     end
 
     def align
       if @bit_num > 0
-        @buffer << @cur
-        @cur = 0
+        @io.write_byte(@cur)
+        @cur = 0_u8
         @bit_num = 0
       end
     end
@@ -111,12 +111,11 @@ module BRS::Write
     end
 
     def write_packed_int(value : Int32)
-      write_packed_uint((value.abs << 1).to_u32 | (value >= 0 ? 1 : 0))
+      write_packed_uint ((value.abs.to_u32) << 1) | (value > 0 ? 1_u32 : 0_u32)
     end
 
-    def write_to(io : IO::Memory)
+    def finish
       align
-      io.write(Bytes.new(@buffer.size) { |i| @buffer[i] })
     end
   end
 end
