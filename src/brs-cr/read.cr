@@ -7,9 +7,6 @@ module BRS::Read
   def compression_reader(io : IO) : IO
     uncompressed_size = io.read_bytes(Int32, IO::ByteFormat::LittleEndian)
     compressed_size = io.read_bytes(Int32, IO::ByteFormat::LittleEndian)
-    puts uncompressed_size
-    puts compressed_size
-    puts ""
     raise ReadException.new("Invalid compressed section size") if uncompressed_size < 0 || compressed_size < 0 || compressed_size >= uncompressed_size
     return io if compressed_size == 0
     Zlib::Reader.new(io, sync_close: false)
@@ -78,24 +75,24 @@ module BRS::Read
     def next_position
       @position += 1
       if position >= 8
-        @buffer.read(slice)
+        read_buffer
         @position -= 8
       end
     end
 
     def align
-      @buffer.read(slice) unless @position == 0
+      read_buffer unless @position == 0
       @position = 0
     end
 
     def initialize(@buffer)
-      @buffer.read(slice)
+      read_buffer
     end
 
     def read_bit
       bit = byte & (1 << @position)
       next_position
-      bit == 1_u8
+      bit != 0_u8
     end
 
     def read_int(max)
