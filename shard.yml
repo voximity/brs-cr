@@ -1,0 +1,9 @@
+name: brs-cr
+version: 0.1.0
+
+authors:
+  - voximity <zander@zanderf.net>
+
+crystal: 0.34.0
+
+license: MIT
