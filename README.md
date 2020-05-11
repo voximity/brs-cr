@@ -18,7 +18,28 @@ Only supports versions 4+.
 
 ## Usage
 
-TODO
+```cr
+require "brs-cr"
+
+me = BRS::User.new(username: "x", uuid: UUID.new("3f5108a0-c929-4e77-a115-21f65096887b"))
+
+save = BRS::Save.new(
+  author: me,
+  description: "generated save file"
+)
+
+16.times do |y|
+  16.times do |x|
+    save.bricks << BRS::Brick.new(
+      size: BRS::UVector3.new(5, 5, 2),
+      position: BRS::Vector3.new(5 + x * 10, 5 + y * 10, 2),
+      color_index: Random.rand(0...save.colors.size)
+    )
+  end
+end
+
+save.write(File.new("input/out.brs", mode: "w"))
+```
 
 ## Contributing
 
