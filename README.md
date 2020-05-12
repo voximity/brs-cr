@@ -11,12 +11,14 @@ Only supports versions 4+.
    ```yaml
    dependencies:
      brs-cr:
-       github: your-github-user/brs-cr
+       github: voximity/brs-cr
    ```
 
 2. Run `shards install`
 
 ## Usage
+
+This will create the file `out.brs` with a 16x16 grid of randomly colored 1x1f bricks.
 
 ```cr
 require "brs-cr"
@@ -43,7 +45,7 @@ save.write(File.new("input/out.brs", mode: "w"))
 
 ## Contributing
 
-1. Fork it (<https://github.com/your-github-user/brs-cr/fork>)
+1. Fork it (<https://github.com/voximity/brs-cr/fork>)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
