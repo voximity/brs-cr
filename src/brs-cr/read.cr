@@ -1,9 +1,11 @@
 module BRS::Read
   extend self
 
+  # An exception that is thrown when a save fails to read.
   class ReadException < Exception
   end
 
+  # Returns the appropriate IO for the following two `Int32`s representing uncompressed and compressed block sizes.
   def compression_reader(io : IO) : IO
     uncompressed_size = io.read_bytes(Int32, IO::ByteFormat::LittleEndian)
     compressed_size = io.read_bytes(Int32, IO::ByteFormat::LittleEndian)
@@ -12,6 +14,7 @@ module BRS::Read
     Zlib::Reader.new(io, sync_close: false)
   end
 
+  # 
   def read_string(io : IO) : String
     raw_size = io.read_bytes(Int32, IO::ByteFormat::LittleEndian)
 

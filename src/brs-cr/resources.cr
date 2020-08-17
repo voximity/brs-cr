@@ -65,6 +65,10 @@ module BRS
       writer.write_packed_int @y
       writer.write_packed_int @z
     end
+
+    def +(other : Vector3)
+      Vector3.new(@x + other.x, @y + other.y, @z + other.z)
+    end
   end
 
   struct Color
@@ -81,7 +85,7 @@ module BRS
       self.new(Bytes.new(4).tap { |slice| io.read(slice) })
     end
 
-    def self.new(*, r : Int32, g : Int32, b : Int32, a : Int32)
+    def self.new(*, r : Int32, g : Int32, b : Int32, a : Int32 = 255)
       self.new(r: r.to_u8, g: g.to_u8, b: b.to_u8, a: a.to_u8)
     end
 
@@ -94,7 +98,7 @@ module BRS
       )
     end
 
-    def initialize(*, @r, @g, @b, @a)
+    def initialize(*, @r, @g, @b, @a = 255_u8)
     end
 
     def write(io : IO)
@@ -106,6 +110,19 @@ module BRS
 
     def write(writer : Write::BitWriter)
       writer.write_bytes([@b, @g, @r, @a])
+    end
+
+    protected def lerp(a : UInt8, b : UInt8, c : Float32)
+      (a.to_f32 + (b.to_f32 - a.to_f32) * c).round.to_u8
+    end
+
+    def lerp(other : Color, c : Float32)
+      Color.new(
+        r: lerp(@r, other.r, c),
+        g: lerp(@g, other.g, c),
+        b: lerp(@b, other.b, c),
+        a: lerp(@a, other.a, c)
+      )
     end
   end
 
