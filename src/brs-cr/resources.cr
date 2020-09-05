@@ -69,6 +69,18 @@ module BRS
     def +(other : Vector3)
       Vector3.new(@x + other.x, @y + other.y, @z + other.z)
     end
+
+    def *(other : Vector3)
+      Vector3.new(@x * other.x, @y * other.y, @z * other.z)
+    end
+
+    def dot(other : Vector3)
+      @x * other.x + @y * other.y + @z * other.z
+    end
+
+    def cross(other : Vector3)
+      Vector3.new(@y * other.z - @z * other.y, -@x * other.z + @z * other.x, @x * other.y - @y * other.x)
+    end
   end
 
   struct Color
